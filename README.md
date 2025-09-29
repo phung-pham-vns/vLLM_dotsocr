@@ -19,32 +19,3 @@ Push to registry
 ```bash
 docker push phungpx/dotsocr-gpu-cuda-12-dot-4:latest
 ```
-
-Run on Kaggle
-
-```
-!pip install vllm --extra-index-url https://wheels.vllm.ai/nightly
-!vllm serve rednote-hilab/dots.ocr --trust-remote-code --port 8000 --host 0.0.0.0
-!pip install pyngrok
-
-from pyngrok import ngrok
-
-# Start tunnel to expose port 8000
-public_url = ngrok.connect(8000)
-print("Public endpoint:", public_url)
-```
-
-```
-import requests
-
-url = "https://xxxx-xx-xx-xx-8000.ngrok-free.app/v1/completions"
-headers = {"Content-Type": "application/json"}
-data = {
-    "model": "rednote-hilab/dots.ocr",
-    "prompt": "Recognize text from this image:",
-    "image": "https://your-image-url.jpg"
-}
-
-resp = requests.post(url, headers=headers, json=data)
-print(resp.json())
-```
