@@ -12,7 +12,7 @@ VLLM Image: `vllm/vllm-openai:nightly`
 Docker Compose Run
 
 ```bash
-docker compose up
+HF_TOKEN=<hugging-face-token> docker compose up
 ```
 
 Docker Run
