@@ -65,6 +65,8 @@ Port mapping
 ssh -L 8000:127.0.0.1:8000 -p 56891 root@103.73.232.228
 ```
 
+VRAM Usage: ~15.5GiB (NVIDIA H100 80GB HBM3)
+
 
 ## Test APIs
 
