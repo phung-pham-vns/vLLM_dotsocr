@@ -21,6 +21,12 @@ Logs
 docker compose logs -f
 ```
 
+Docker Compose Shutdown
+
+```bash
+docker compose down
+```
+
 (Alternative way) Docker Run
 
 ```
@@ -36,3 +42,14 @@ docker run -d \
   --trust-remote-code
 ```
 
+Test APIs
+
+- Other options: https://docs.vllm.ai/en/stable/serving/openai_compatible_server.html
+
+`--dtype "bfloat16"`: https://huggingface.co/rednote-hilab/dots.ocr/blob/main/config.json
+`--max-model-len 32768`: https://huggingface.co/rednote-hilab/dots.ocr/blob/main/generation_config.json
+`--block-size`: https://docs.vllm.ai/en/stable/configuration/engine_args.html#-block-size
+`--gpu-memory-utilization`: https://docs.vllm.ai/en/stable/configuration/engine_args.html#-gpu-memory-utilization
+`--kv-cache-dtype`: https://docs.vllm.ai/en/stable/configuration/engine_args.html#-kv-cache-dtype
+`--limit-mm-per-prompt`: ...
+...
