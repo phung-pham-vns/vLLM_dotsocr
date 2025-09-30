@@ -48,7 +48,9 @@ docker run -d \
 
 ### 3. Run on GreenNode
 
-Script
+Step 1. Launch Instance with docker image `vllm/vllm-openai:nightly`
+
+Step 2. Run Script on Terminal
 
 ```
 HUGGING_FACE_HUB_TOKEN=<your-hugging-face-token> \
@@ -59,7 +61,7 @@ python3 -m vllm.entrypoints.openai.api_server \
   --port 8000
 ```
 
-Port mapping
+Step 3. Map port to run service locally
 
 ```bash
 ssh -L 8000:127.0.0.1:8000 -p 56891 root@103.73.232.228
