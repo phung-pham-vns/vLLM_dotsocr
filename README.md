@@ -7,6 +7,10 @@ A powerful multilingual OCR model from HiLab
 - Compact 1.7B VLM, but achieves SOTA results on OmniDocBench & dots.ocr-bench
 - Free for commercial use.
 
+## Usage
+
+### 1. Run with docker compose
+
 VLLM Image: `vllm/vllm-openai:nightly`
 
 Docker Compose Run
@@ -27,7 +31,7 @@ Docker Compose Shutdown
 docker compose down
 ```
 
-(Alternative way) Docker Run
+### 2. Docker
 
 ```
 docker run -d \
@@ -42,7 +46,27 @@ docker run -d \
   --trust-remote-code
 ```
 
-Test APIs
+### 3. Run on GreenNode
+
+Script
+
+```
+HUGGING_FACE_HUB_TOKEN=<your-hugging-face-token> \
+python3 -m vllm.entrypoints.openai.api_server \
+  --model rednote-hilab/dots.ocr \
+  --trust-remote-code \
+  --host 0.0.0.0 \
+  --port 8000
+```
+
+Port mapping
+
+```bash
+ssh -L 8000:127.0.0.1:8000 -p 56891 root@103.73.232.228
+```
+
+
+## Test APIs
 
 - Other options: https://docs.vllm.ai/en/stable/serving/openai_compatible_server.html
 

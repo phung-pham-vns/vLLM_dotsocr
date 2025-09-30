@@ -1,8 +1,9 @@
 from openai import OpenAI
-from dotenv import load_dotenv
-import os
 
-load_dotenv()
+# from dotenv import load_dotenv
+# import os
+
+# load_dotenv()
 
 prompt = """Please output the layout information from the PDF image, including each layout element's bbox, its category, and the corresponding text content within the bbox.
 
@@ -24,11 +25,12 @@ prompt = """Please output the layout information from the PDF image, including e
 
 
 # Connect OpenAI client to your vLLM server
-lvlm_url = os.getenv("LVLM_URL")
+# lvlm_url = os.getenv("LVLM_URL")
+lvlm_url = "http://0.0.0.0:8000/v1"
 client = OpenAI(base_url=lvlm_url, api_key="empty")
 
 response = client.chat.completions.create(
-    model=None,
+    model="rednote-hilab/dots.ocr",
     messages=[
         {
             "role": "user",
@@ -45,4 +47,4 @@ response = client.chat.completions.create(
     ],
 )
 
-print(eval(response.choices[0].message.content))
+print(response.choices[0].message.content)
