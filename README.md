@@ -1,4 +1,4 @@
-# dots.ocr
+### dots.ocr
 
 A powerful multilingual OCR model from HiLab
 
@@ -7,15 +7,26 @@ A powerful multilingual OCR model from HiLab
 - Compact 1.7B VLM, but achieves SOTA results on OmniDocBench & dots.ocr-bench
 - Free for commercial use.
 
+VLLM Image: `vllm/vllm-openai:nightly`
 
-Build locally
-
-```bash
-docker build -t phungpx/dotsocr-gpu-cuda-12-dot-4:latest .
-```
-
-Push to registry
+Docker Compose Run
 
 ```bash
-docker push phungpx/dotsocr-gpu-cuda-12-dot-4:latest
+docker compose up
 ```
+
+Docker Run
+
+```
+docker run -d \
+  --gpus all \
+  --ipc=host \
+  --name dots-ocr-vllm \
+  -p 8000:8000 \
+  -v ~/.cache/huggingface:/root/.cache/huggingface \
+  -e HUGGING_FACE_HUB_TOKEN=<hugging-face-token> \
+  vllm/vllm-openai:nightly \
+  --model rednote-hilab/dots.ocr \
+  --trust-remote-code
+```
+

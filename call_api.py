@@ -1,4 +1,8 @@
 from openai import OpenAI
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 prompt = """Please output the layout information from the PDF image, including each layout element's bbox, its category, and the corresponding text content within the bbox.
 
@@ -20,11 +24,10 @@ prompt = """Please output the layout information from the PDF image, including e
 
 
 # Connect OpenAI client to your vLLM server
-client = OpenAI(
-    base_url="https://bnumnpcffgma8r-8000.proxy.runpod.net/v1", api_key="empty"
-)
+lvlm_url = os.getenv("LVLM_URL")
+client = OpenAI(base_url=lvlm_url, api_key="empty")
 
-resp = client.chat.completions.create(
+response = client.chat.completions.create(
     model=None,
     messages=[
         {
@@ -34,7 +37,7 @@ resp = client.chat.completions.create(
                 {
                     "type": "image_url",
                     "image_url": {
-                        "url": "https://amzirlodp-prd-s3.s3.amazonaws.com/documents/images/big_4cda85d892a5c0b5dd63b510a9c83e9c9d06e739.jpg"
+                        "url": "https://incodocs.com/blog/wp-content/uploads/2022/07/Bill-of-Lading-Template-Format-Document.png"
                     },
                 },
             ],
@@ -42,4 +45,4 @@ resp = client.chat.completions.create(
     ],
 )
 
-print(resp.choices[0])
+print(eval(response.choices[0].message.content))

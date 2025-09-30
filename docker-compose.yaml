@@ -1,0 +1,19 @@
+services:
+  dots-ocr-vllm:
+    image: vllm/vllm-openai:nightly
+    container_name: dots-ocr-vllm
+    ports:
+      - "8000:8000"
+    volumes:
+      - ~/.cache/huggingface:/root/.cache/huggingface
+    environment:
+      HUGGING_FACE_HUB_TOKEN: ${HF_TOKEN}
+    ipc: host
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [ gpu ]
+    command: --model rednote-hilab/dots.ocr --trust-remote-code
