@@ -9,11 +9,12 @@ services:
       - "8000:8000"
     volumes:
       - ~/.cache/huggingface:/root/.cache/huggingface
-    environment:
-      HUGGING_FACE_HUB_TOKEN: ${HF_TOKEN}
-      VLLM_MODEL: ${VLLM_MODEL:-rednote-hilab/dots.ocr}
-      VLLM_HOST: ${VLLM_HOST:-0.0.0.0}
-      VLLM_PORT: ${VLLM_PORT:-8000}
+      # no need running environment variables
+    # environment:
+    #   HUGGING_FACE_HUB_TOKEN: ${HF_TOKEN}
+    #   VLLM_MODEL: ${VLLM_MODEL:-rednote-hilab/dots.ocr}
+    #   VLLM_HOST: ${VLLM_HOST:-0.0.0.0}
+    #   VLLM_PORT: ${VLLM_PORT:-8000}
     ipc: host
     # Request NVIDIA GPUs for local Compose (non‑Swarm)
     device_requests:
