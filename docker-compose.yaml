@@ -17,10 +17,10 @@ services:
     #   VLLM_PORT: ${VLLM_PORT:-8000}
     ipc: host
     # Request NVIDIA GPUs for local Compose (non‑Swarm)
-    device_requests:
-      - driver: nvidia
-        count: all
-        capabilities: [ gpu ]
+    # device_requests:
+    #   - driver: nvidia
+    #     count: all
+    #     capabilities: [ gpu ]
     restart: unless-stopped
     # Increase startup timeout for model download
     healthcheck:
