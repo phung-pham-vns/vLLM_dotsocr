@@ -1,27 +1,46 @@
 FROM vllm/vllm-openai:nightly
 
-# Install huggingface-hub for model downloading
-RUN pip install huggingface-hub
+# Install dependencies for pulling models from Hugging Face
+RUN pip install --no-cache-dir huggingface-hub
 
-# Create a startup script that downloads model only if not cached
-RUN echo '#!/bin/bash\n\
-VLLM_MODEL="rednote-hilab/dots.ocr"\n\
-CACHE_DIR="/root/.cache/huggingface"\n\
-MODEL_PATH="$CACHE_DIR/models--$VLLM_MODEL"\n\
-\n\
-# Check if model is already cached\n\
-if [ ! -d "$MODEL_PATH" ]; then\n\
-    echo "Model not found in cache. Downloading..."\n\
-    python3 -c "from huggingface_hub import snapshot_download; import os; snapshot_download(\"$MODEL_NAME\", cache_dir=\"$CACHE_DIR\", token=os.getenv(\"HUGGING_FACE_HUB_TOKEN\"))"\n\
-    echo "Model download completed."\n\
-else\n\
-    echo "Model found in cache. Skipping download."\n\
-fi\n\
-\n\
-# Start vLLM server on port 8000 (matches EXPOSE)\n\
-exec python3 -m vllm.entrypoints.openai.api_server --model "$VLLM_MODEL" --trust-remote-code --host "0.0.0.0" --port "8000"\n\
-' > /app/start.sh && chmod +x /app/start.sh
+# Ensure the app directory exists
+RUN mkdir -p /app
+
+# Startup script:
+# 1) Ensure the model is present in the cache (snapshot_download is idempotent)
+# 2) Start the vLLM OpenAI-compatible server
+COPY <<'EOF' /app/start.sh
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Allow overrides via environment variables
+VLLM_MODEL="${VLLM_MODEL:-rednote-hilab/dots.ocr}"
+VLLM_HOST="${VLLM_HOST:-0.0.0.0}"
+VLLM_PORT="${VLLM_PORT:-8000}"
+CACHE_DIR="${CACHE_DIR:-/root/.cache/huggingface}"
+
+# Download the model if needed (no re-download if already cached)
+python3 - <<PY
+import os
+from huggingface_hub import snapshot_download
+
+repo = os.environ.get("VLLM_MODEL", "rednote-hilab/dots.ocr")
+cache_dir = os.environ.get("CACHE_DIR", "/root/.cache/huggingface")
+token = os.environ.get("HUGGING_FACE_HUB_TOKEN")  # optional/private repos
+
+snapshot_download(repo_id=repo, cache_dir=cache_dir, token=token)
+print(f"Model ready in cache: {repo}")
+PY
+
+# Launch vLLM API server
+exec python3 -m vllm.entrypoints.openai.api_server \
+  --model "$VLLM_MODEL" \
+  --trust-remote-code \
+  --host "$VLLM_HOST" \
+  --port "$VLLM_PORT"
+EOF
+
+RUN chmod +x /app/start.sh
 
 EXPOSE 8000
-
 CMD ["/app/start.sh"]
