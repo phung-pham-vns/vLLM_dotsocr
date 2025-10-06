@@ -1,0 +1,25 @@
+FROM vllm/vllm-openai:latest
+
+# Install dependencies for pulling models from Hugging Face
+RUN pip install --no-cache-dir huggingface-hub
+
+# Ensure the app directory exists
+RUN mkdir -p /app
+
+# Copy the startup script from the host
+COPY startup_mineru.sh /app/start_mineru.sh
+
+# Set environment variable defaults for MinerU model
+ENV VLLM_MODEL="opendatalab/MinerU2.5-2509-1.2B"
+ENV VLLM_HOST="0.0.0.0"
+ENV VLLM_PORT="8001"
+ENV CACHE_DIR="/root/.cache/huggingface"
+
+# Make the startup script executable
+RUN chmod +x /app/start_mineru.sh
+
+# Expose the port
+EXPOSE 8001
+
+# Set the entrypoint
+CMD ["/app/start_mineru.sh"]
