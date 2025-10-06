@@ -1,10 +1,10 @@
 services:
-  dots-ocr-vllm:
+  dots-ocr:
     build:
       context: .
       dockerfile: Dockerfile
       # No build args needed for the HF token; pass it at runtime below
-    container_name: dots-ocr-vllm
+    container_name: dots-ocr
     ports:
       - "8000:8000"
 
@@ -21,7 +21,7 @@ services:
       # VLLM_PORT: "8000"
 
     ipc: host
-    restart: unless-stopped
+    restart: always
 
     # Healthcheck waits for the model server to be up
     healthcheck:
@@ -31,7 +31,7 @@ services:
       retries: 10
       start_period: 300s
 
-  mineru-vllm:
+  mineru:
     build:
       context: .
       dockerfile: Dockerfile.mineru
@@ -63,12 +63,12 @@ services:
               capabilities: [gpu]
 
     ipc: host
-    restart: unless-stopped
+    restart: no
 
     # Healthcheck waits for the model server to be up
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8001/v1/models"]
-      interval: 30s
-      timeout: 10s
-      retries: 10
-      start_period: 300s
+    # healthcheck:
+    #   test: ["CMD", "curl", "-f", "http://localhost:8001/v1/models"]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 10
+    #   start_period: 300s
