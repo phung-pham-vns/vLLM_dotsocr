@@ -11,10 +11,6 @@ services:
     ports:
       - "8000:8000"
 
-    # Mount the host HF cache so you don't re-download the model each time
-    volumes:
-      - ${HOME}/.cache/huggingface:/root/.cache/huggingface
-
     # GPU configuration for NVIDIA runtime
     environment:
       HUGGING_FACE_HUB_TOKEN: ${HF_TOKEN}
