@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   dots-ocr:
     build:
@@ -5,6 +7,7 @@ services:
       dockerfile: Dockerfile
       # No build args needed for the HF token; pass it at runtime below
     container_name: dots-ocr
+    runtime: nvidia
     ports:
       - "8000:8000"
 
@@ -12,9 +15,10 @@ services:
     volumes:
       - ${HOME}/.cache/huggingface:/root/.cache/huggingface
 
-    # If the model is private or needs a token, set HF_TOKEN in a .env file
+    # GPU configuration for NVIDIA runtime
     environment:
       HUGGING_FACE_HUB_TOKEN: ${HF_TOKEN}
+      NVIDIA_VISIBLE_DEVICES: all
       # Optional overrides:
       # VLLM_MODEL: rednote-hilab/dots.ocr
       # VLLM_HOST: 0.0.0.0
@@ -53,17 +57,8 @@ services:
       VLLM_PORT: "8001"
       NVIDIA_VISIBLE_DEVICES: all
 
-    # Enable GPU access
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
-
     ipc: host
-    restart: no
+    restart: never
 
     # Healthcheck waits for the model server to be up
     # healthcheck:
