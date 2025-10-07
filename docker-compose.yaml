@@ -1,19 +1,65 @@
+version: '3.8'
+
 services:
-  dots-ocr-vllm:
-    image: vllm/vllm-openai:nightly
-    container_name: dots-ocr-vllm
+  dots-ocr:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      # No build args needed for the HF token; pass it at runtime below
+    container_name: dots-ocr
+    runtime: nvidia
     ports:
       - "8000:8000"
-    volumes:
-      - ~/.cache/huggingface:/root/.cache/huggingface
+
+    # GPU configuration for NVIDIA runtime
     environment:
       HUGGING_FACE_HUB_TOKEN: ${HF_TOKEN}
+      NVIDIA_VISIBLE_DEVICES: all
+      # Optional overrides:
+      # VLLM_MODEL: rednote-hilab/dots.ocr
+      # VLLM_HOST: 0.0.0.0
+      # VLLM_PORT: "8000"
+
     ipc: host
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [ gpu ]
-    command: --model rednote-hilab/dots.ocr --trust-remote-code
+    restart: always
+
+    # Healthcheck waits for the model server to be up
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/v1/models"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 300s
+
+  mineru:
+    build:
+      context: .
+      dockerfile: Dockerfile.mineru
+      # No build args needed for the HF token; pass it at runtime below
+    container_name: minerU-2.5
+    runtime: nvidia
+    ports:
+      - "8001:8001"
+
+    # Mount the host HF cache so you don't re-download the model each time
+    volumes:
+      - ~/.cache/huggingface:/root/.cache/huggingface
+
+    # GPU configuration for NVIDIA runtime
+    environment:
+      HUGGING_FACE_HUB_TOKEN: ${HF_TOKEN}
+      VLLM_MODEL: "opendatalab/MinerU2.5-2509-1.2B"
+      VLLM_HOST: "0.0.0.0"
+      VLLM_PORT: "8001"
+      NVIDIA_VISIBLE_DEVICES: all
+
+    ipc: host
+    restart: never
+
+    # Healthcheck waits for the model server to be up
+    # healthcheck:
+    #   test: ["CMD", "curl", "-f", "http://localhost:8001/v1/models"]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 10
+    #   start_period: 300s
